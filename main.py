@@ -1,10 +1,10 @@
-import dearpygui.dearpygui as dpg
 import math
 import time
 import collections
 import threading
 import pdb
 
+import dearpygui.dearpygui as dpg
 import psutil
 
 
