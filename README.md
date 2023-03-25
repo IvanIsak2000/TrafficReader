@@ -14,3 +14,24 @@ FUNCTONS
 <br>
 
 ![image](https://user-images.githubusercontent.com/79650307/227699076-d0101105-748d-418b-940e-e5e06d967804.png)
+
+
+<hr>
+
+2. You can change plot speed 
+``UPDATE_DELAY = <time>`` in second ,by default = 1
+
+![speed_differency](https://user-images.githubusercontent.com/79650307/227700391-92cf1442-1802-4b5c-88db-dee86dbadb65.gif)
+
+
+
+HOW TO USE
+--
+
+1. Install libs
+``pip install -r requerements.txt``
+
+2. Launch file 
+``main.py``
+
+
