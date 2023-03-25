@@ -58,7 +58,7 @@ def update_data():
 
 dpg.create_context()
 dpg.create_viewport(title='network-speed', width=850, height=640)
-with dpg.window(label='', width=800, height=600):
+with dpg.window(label='', width=800, height=600, tag = 'Primary Window'):
 
     with dpg.plot(label='Speed', height=-1, width=-1):
 
@@ -78,6 +78,7 @@ with dpg.window(label='', width=800, height=600):
 dpg.setup_dearpygui()
 dpg.show_viewport()
 thread = threading.Thread(target=update_data)
+dpg.set_primary_window('Primary Window',True)
 thread.start()
 dpg.start_dearpygui()
 dpg.destroy_context()
