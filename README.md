@@ -1,3 +1,9 @@
+<div id="header" align="center">
+
+![image](https://github.com/IvanIsak2000/network-speed/blob/master/logo.png)
+
+</div>
+
 EN
 ==
 
