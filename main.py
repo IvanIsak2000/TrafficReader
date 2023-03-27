@@ -28,7 +28,7 @@ data_y = [0.0] * nsamples
 data_x = [0.0] * nsamples
 
 
-UPDATE_DELAY = 0.1
+UPDATE_DELAY = 1
 
 
 def get_net_speed():
