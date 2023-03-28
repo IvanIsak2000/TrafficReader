@@ -15,6 +15,10 @@ FUNCTONS
 --
 1. Representation of the download speed in the form of a dynamic graph
 
+![image](https://user-images.githubusercontent.com/79650307/228206989-09ae9056-8862-4dae-9315-92f843669a54.png)
+
+
+
 ![video](https://user-images.githubusercontent.com/79650307/227215706-46e3c26a-e8c9-4031-bc36-7dae521f91cf.gif)
 
 <br>
