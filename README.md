@@ -13,7 +13,9 @@ A simple application for visual representation of your network speed data!
 
 FUNCTONS
 --
-1. Representation of the download speed in the form of a dynamic graph
+1. Representation of the `download speed` in the form of a dynamic graph
+2. Representation of `upload speed` on a dynamic graph
+<br>
 
 ![image](https://user-images.githubusercontent.com/79650307/228206989-09ae9056-8862-4dae-9315-92f843669a54.png)
 
