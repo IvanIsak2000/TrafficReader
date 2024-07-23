@@ -16,12 +16,8 @@ with sqlite3.connect("network_history.db") as db:  # create db for program
         ) """
     cursor.execute(query_start)
 nsamples = 100
-global data_y
-global data_x
 data_y = [0.0] * nsamples
 data_x = [0.0] * nsamples
-global data_y1
-global data_x1
 data_y1 = [0.0] * nsamples
 data_x1 = [0.0] * nsamples
 UPDATE_DELAY = 1
