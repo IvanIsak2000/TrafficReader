@@ -1,45 +1,44 @@
 #!/usr/bin/env python3
 import time
 import threading
-import sqlite3
+from sqlite3 import connect
 from datetime import datetime
 import pytz
 import dearpygui.dearpygui as dpg
-import psutil
+from psutil import net_io_counters
 
 
-with sqlite3.connect("network_history.db") as db:  # create db for program
+with connect("network_history.db") as db:  # create db for program
     cursor = db.cursor()
-    query_start = """ CREATE TABLE IF NOT EXISTS network(
-        KB_per_second TEXT,
+    query_start = """CREATE TABLE IF NOT EXISTS network(
+        KB_per_second REAL,
         recording_time TEXT
-        ) """
+        );"""
     cursor.execute(query_start)
-nsamples = 100
-data_y = [0.0] * nsamples
-data_x = [0.0] * nsamples
-data_y1 = [0.0] * nsamples
-data_x1 = [0.0] * nsamples
-UPDATE_DELAY = 1
+nsamples: int = 100
+data_y: list[float] = [0.0] * nsamples
+data_x: list[float] = [0.0] * nsamples
+data_y1: list[float] = [0.0] * nsamples
+data_x1: list[float] = [0.0] * nsamples
+UPDATE_DELAY: int = 1
 
 
-def get_net_speed():
-    io = psutil.net_io_counters()
+def get_net_speed() -> tuple[float, float]:
+    io = net_io_counters()
     bytes_sent, bytes_recv = io.bytes_sent, io.bytes_recv
     time.sleep(UPDATE_DELAY)
-    io_2 = psutil.net_io_counters()
-    us, ds = io_2.bytes_sent - bytes_sent, io_2.bytes_recv - bytes_recv
-    us = (us / 1024) / UPDATE_DELAY
-    ds = (ds / 1024) / UPDATE_DELAY  # download speed
-    return (us, ds)
+    io_2 = net_io_counters()
+    upload_speed: float = (io_2.bytes_sent - bytes_sent) / 1024 / UPDATE_DELAY
+    download_speed: float = (io_2.bytes_recv - bytes_recv) / 1024 / UPDATE_DELAY
+    return (upload_speed, download_speed)
     # print(us, ds)
     # bytes_sent, bytes_recv = io_2.bytes_sent, io_2.bytes_recv
 
 
-def update_data():
-    sample = 1
-    t0 = time.time()
-    frequency = 1.0
+def update_data() -> None:
+    sample: int = 1
+    t0: float = time.time()
+    frequency: float = 1.0
     while True:
         t = time.time() - t0
         y = float(get_net_speed()[1])
@@ -64,9 +63,11 @@ def update_data():
         recording_time = datetime.now(pytz.timezone("Europe/Moscow")).strftime(
             "%H:%M:%S %Y-%m-%d"
         )  # UTC+3
-        with sqlite3.connect("network_history.db") as db:
+        with connect("network_history.db") as db:
             cursor = db.cursor()
-            query = """INSERT INTO network(KB_per_second,recording_time) VALUES(?,?) """
+            query = """
+            INSERT INTO network(KB_per_second, recording_time) VALUES(?, ?);
+            """
             data = [(str(get_net_speed()[1]), str(recording_time))]
             cursor.executemany(query, data)
 
