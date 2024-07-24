@@ -39,7 +39,7 @@ A simple application for visual representation of your network speed data!
 git clone  https://github.com/IvanIsak2000/network-speed.git
 ```
 2. Install libs
-``pip install -r requerements.txt``
+``poetry shell && poetry install ``
 
 3. Launch file 
-``main.py``
+``python3 main.py``
