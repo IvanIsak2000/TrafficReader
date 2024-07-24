@@ -8,6 +8,8 @@ import dearpygui.dearpygui as dpg
 from psutil import net_io_counters
 
 
+UPDATE_DELAY: int = 0.1
+
 with connect("network_history.db") as db:  # create db for program
     cursor = db.cursor()
     query_start = """CREATE TABLE IF NOT EXISTS network(
@@ -20,7 +22,6 @@ data_y: list[float] = [0.0] * nsamples
 data_x: list[float] = [0.0] * nsamples
 data_y1: list[float] = [0.0] * nsamples
 data_x1: list[float] = [0.0] * nsamples
-UPDATE_DELAY: int = 1
 
 
 def get_net_speed() -> tuple[float, float]:
