@@ -7,7 +7,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-dearpygui = "^1.11.1"
 pytz = "^2024.1"
 psutil = "^6.0.0"
 redis = "^5.0.7"
