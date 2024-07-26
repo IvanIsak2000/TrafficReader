@@ -3,11 +3,10 @@ import os
 import sys
 import redis
 import time
-import threading
+import argparse
 from sqlite3 import connect
 from datetime import datetime
 import pytz
-import dearpygui.dearpygui as dpg
 from psutil import net_io_counters
 from datetime import datetime
 
@@ -94,8 +93,8 @@ def get_net_speed() -> tuple[float, float]:
     time.sleep(UPDATE_DELAY)
     io_2 = net_io_counters()
 
-    upload_speed: float = (io_2.bytes_sent - bytes_sent) / 1024 / UPDATE_DELAY
-    download_speed: float = (io_2.bytes_recv - bytes_recv) / 1024 / UPDATE_DELAY
+    upload_speed: float = (io_2.bytes_sent - bytes_sent) / 1024 
+    download_speed: float = (io_2.bytes_recv - bytes_recv) / 1024 
     now_time = datetime.now(pytz.timezone(TIMEZONE)).strftime("%Y-%m-%d %H:%M:%S")
 
     upload_speed = round(upload_speed, 2)
@@ -112,39 +111,16 @@ def print_to_terminal(u_s, d_s, timestamp: str) -> None:
     counter.update()
 
 
-def update_data() -> None:
-    sample: int = 1
-    t0: float = time.time()
+def getting_traffic() -> None:
     while True:
-        t = time.time() - t0
-        y1 = float(get_net_speed()[0])
-        y = float(get_net_speed()[1])
-
-        timestamp = get_net_speed()[2]
-        upload_speed = y1
-        download_speed = y
-
+        upload_speed = float(get_net_speed()[0])
+        download_speed = float(get_net_speed()[1])
+        timestamp = str(get_net_speed()[2])
+        
         if TERMINAL_OUTPUT:
             print_to_terminal(u_s=upload_speed, d_s=download_speed, timestamp=timestamp)
 
-        data_x.append(t)
-        data_y.append(y)
-        data_x1.append(t)
-        data_y1.append(y1)
-        # set the series x and y to the last nsamples
-        dpg.set_value(
-            "plot1", [list(data_x[-nsamples:]), list(data_y[-nsamples:])]
-        )
-        dpg.set_value(
-            "plot2", [list(data_x1[-nsamples:]), list(data_y1[-nsamples:])]
-        )
-        dpg.fit_axis_data("x_axis")
-        dpg.fit_axis_data("y_axis")
-        dpg.fit_axis_data("x1_axis")
-        dpg.fit_axis_data("y1_axis")
-        sample = sample + 1
-
-        db.add_record(upload_speed=str(upload_speed), download_speed=str(download_speed))
+        db.add_record(upload_speed=upload_speed, download_speed=download_speed)
 
 
 if __name__ == "__main__":
@@ -153,46 +129,12 @@ if __name__ == "__main__":
     db = DB()
     db.create_db()
 
-    nsamples: int = 100
-    data_y: list[float] = [0.0] * nsamples
-    data_x: list[float] = [0.0] * nsamples
-    data_y1: list[float] = [0.0] * nsamples
-    data_x1: list[float] = [0.0] * nsamples
+    parser = argparse.ArgumentParser(description='Welcome to traffic reader')
 
-    dpg.create_context()
-    dpg.create_viewport(title="network-speed", width=850, height=640)
-    try:
-        with dpg.window(label="", width=800, height=600, tag="Primary Window"):
-            with dpg.plot(label="Speed", height=-1, width=-1):
-                dpg.add_plot_legend()
-                x_axis = dpg.add_plot_axis(
-                    dpg.mvXAxis, label="time by start", tag="x_axis"
-                )
-                y_axis = dpg.add_plot_axis(dpg.mvYAxis, label="KB/s", tag="y_axis")
-                dpg.add_line_series(
-                    x=list(data_x),
-                    y=list(data_y),
-                    label="Download speed",
-                    parent="y_axis",
-                    tag="plot1",
-                )
-                x1_axis = dpg.add_plot_axis(dpg.mvXAxis, label="", tag="x1_axis")
-                y1_axis = dpg.add_plot_axis(dpg.mvYAxis, label="", tag="y1_axis")
-                dpg.add_line_series(
-                    x=list(data_x1),
-                    y=list(data_y1),
-                    label="Upload speed",
-                    parent="y1_axis",
-                    tag="plot2",
-                )
-                dpg.setup_dearpygui()
-                dpg.show_viewport()
-                thread = threading.Thread(target=update_data)
-                dpg.set_primary_window("Primary Window", True)
-                thread.start()
-                dpg.start_dearpygui()
-                dpg.destroy_context()
-    except KeyboardInterrupt:
-        sys.exit()
-    except SystemError:
-        sys.exit()
+    parser.add_argument('-c' '--colored', action='store_true', help='colored text to terminal output', default=False)
+
+    args = parser.parse_args()
+    if args.c__colored:
+        TERMINAL_OUTPUT = True
+
+    getting_traffic()
