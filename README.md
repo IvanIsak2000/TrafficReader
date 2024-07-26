@@ -1,6 +1,6 @@
 <div id="header" align="center">
 
-  ![logo](https://github.com/IvanIsak2000/network-speed/assets/79650307/695b75e6-8aa0-418c-acfb-9860ec52e9fb)
+![logo](https://github.com/user-attachments/assets/4357fe9b-a0d1-4821-8159-2aed8a91b085)
 
 
 </div>
