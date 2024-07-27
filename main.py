@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-import sys
 import redis
 import time
 import argparse
@@ -9,7 +8,6 @@ from datetime import datetime
 import pytz
 from psutil import net_io_counters
 from datetime import datetime
-
 from termcolor import colored
 
 
@@ -17,7 +15,7 @@ from termcolor import colored
 UPDATE_DELAY = 0.1
 FOLDER = 'history'
 TIMEZONE = 'Europe/Moscow'
-TERMINAL_OUTPUT = True
+TERMINAL_OUTPUT = False
 ROW_LIMIT = 30
 
 
@@ -87,25 +85,22 @@ def colored_text(upload_speed: float, download_speed: float) -> tuple():
     return (u_s, d_s)
 
 
-def get_net_speed() -> tuple[float, float]:
+def get_net_speed() -> tuple[float, float, str]:
     io = net_io_counters()
     bytes_sent, bytes_recv = io.bytes_sent, io.bytes_recv
     time.sleep(UPDATE_DELAY)
     io_2 = net_io_counters()
 
-    upload_speed: float = (io_2.bytes_sent - bytes_sent) / 1024 
-    download_speed: float = (io_2.bytes_recv - bytes_recv) / 1024 
-    now_time = datetime.now(pytz.timezone(TIMEZONE)).strftime("%Y-%m-%d %H:%M:%S")
+    upload_speed: float = (io_2.bytes_sent - bytes_sent) / 1024
+    download_speed: float = (io_2.bytes_recv - bytes_recv) / 1024
 
-    upload_speed = round(upload_speed, 2)
-    download_speed = round(download_speed, 2)
-    return (upload_speed, download_speed, now_time)
+    return (round(upload_speed, 2), round(download_speed, 2))
 
 
 def print_to_terminal(u_s, d_s, timestamp: str) -> None:
     row_count = counter.get()
     if row_count % ROW_LIMIT == 0 and row_count >= 10:
-        os.system('clear')  
+        os.system('clear')
     u_s, d_s = colored_text(u_s, d_s)
     print('{:>16} ⬆️   {:>16} ⬇️   {:>5} ⌛  {:>5} 🆔'.format(u_s, d_s, timestamp, row_count))
     counter.update()
@@ -115,8 +110,8 @@ def getting_traffic() -> None:
     while True:
         upload_speed = float(get_net_speed()[0])
         download_speed = float(get_net_speed()[1])
-        timestamp = str(get_net_speed()[2])
-        
+        timestamp = datetime.now(pytz.timezone(TIMEZONE)).strftime("%Y-%m-%d %H:%M:%S")
+
         if TERMINAL_OUTPUT:
             print_to_terminal(u_s=upload_speed, d_s=download_speed, timestamp=timestamp)
 
@@ -125,16 +120,18 @@ def getting_traffic() -> None:
 
 if __name__ == "__main__":
     r = redis.Redis()
+    r.set('terminal_output', 'False')
     counter = Counter()
     db = DB()
     db.create_db()
 
     parser = argparse.ArgumentParser(description='Welcome to traffic reader')
-
     parser.add_argument('-c' '--colored', action='store_true', help='colored text to terminal output', default=False)
-
     args = parser.parse_args()
+
     if args.c__colored:
+        r.set('terminal_output', 'gfgf')
         TERMINAL_OUTPUT = True
 
+    print(r.get('terminal_output'))
     getting_traffic()
